@@ -1,0 +1,34 @@
+import { type SyncableEntityOptions } from '@/application/syncableEntityOptionsType';
+
+export type ObjectPermissionManifest = SyncableEntityOptions & {
+  objectUniversalIdentifier: string;
+  canReadObjectRecords?: boolean;
+  canUpdateObjectRecords?: boolean;
+  canSoftDeleteObjectRecords?: boolean;
+  canDestroyObjectRecords?: boolean;
+};
+
+export type FieldPermissionManifest = SyncableEntityOptions & {
+  objectUniversalIdentifier: string;
+  fieldUniversalIdentifier: string;
+  canReadFieldValue?: boolean;
+  canUpdateFieldValue?: boolean;
+};
+
+export type RoleManifest = SyncableEntityOptions & {
+  label: string;
+  description?: string;
+  icon?: string;
+  canUpdateAllSettings?: boolean;
+  canAccessAllTools?: boolean;
+  canReadAllObjectRecords?: boolean;
+  canUpdateAllObjectRecords?: boolean;
+  canSoftDeleteAllObjectRecords?: boolean;
+  canDestroyAllObjectRecords?: boolean;
+  canBeAssignedToUsers?: boolean;
+  canBeAssignedToAgents?: boolean;
+  canBeAssignedToApiKeys?: boolean;
+  objectPermissions?: ObjectPermissionManifest[];
+  fieldPermissions?: FieldPermissionManifest[];
+  permissionFlagUniversalIdentifiers?: string[];
+};

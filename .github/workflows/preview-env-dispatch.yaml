@@ -1,0 +1,47 @@
+name: 'Preview Environment Dispatch'
+
+permissions: {}
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, labeled]
+    paths:
+      - packages/twenty-docker/**
+      - packages/twenty-server/**
+      - packages/twenty-front/**
+      - .github/workflows/preview-env-dispatch.yaml
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  trigger-preview:
+    if: |
+      (github.event.action == 'labeled' && github.event.label.name == 'preview-app') ||
+      (
+        (
+          github.event.pull_request.author_association == 'MEMBER' ||
+          github.event.pull_request.author_association == 'OWNER' ||
+          github.event.pull_request.author_association == 'COLLABORATOR'
+        ) && (
+          github.event.action == 'opened' ||
+          github.event.action == 'synchronize' ||
+          github.event.action == 'reopened'
+        )
+      )
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch preview-env to ci-privileged
+        env:
+          GH_TOKEN: ${{ secrets.CI_PRIVILEGED_DISPATCH_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          gh api repos/twentyhq/ci-privileged/dispatches \
+            -f event_type=preview-environment \
+            -f "client_payload[pr_number]=$PR_NUMBER" \
+            -f "client_payload[pr_head_sha]=$PR_HEAD_SHA" \
+            -f "client_payload[repo]=$REPOSITORY"
