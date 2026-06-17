@@ -22,6 +22,11 @@ export const MinimalMetadataGater = ({ children }: React.PropsWithChildren) => {
     isMatchingLocation(location, AppPath.Invite) ||
     isMatchingLocation(location, AppPath.ResetPassword) ||
     isMatchingLocation(location, AppPath.CreateWorkspace) ||
+    isMatchingLocation(location, AppPath.CreateProfile) ||
+    isMatchingLocation(location, AppPath.SyncEmails) ||
+    isMatchingLocation(location, AppPath.InviteTeam) ||
+    isMatchingLocation(location, AppPath.BookCallDecision) ||
+    isMatchingLocation(location, AppPath.BookCall) ||
     isMatchingLocation(location, AppPath.PlanRequired) ||
     isMatchingLocation(location, AppPath.PlanRequiredSuccess) ||
     isMatchingLocation(location, AppPath.Authorize);
