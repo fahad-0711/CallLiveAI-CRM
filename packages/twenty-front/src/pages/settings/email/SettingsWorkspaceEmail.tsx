@@ -54,7 +54,7 @@ export const SettingsWorkspaceEmail = () => {
             <SettingsOptionCardContentButton
               Icon={IconLock}
               title={t`Emailing is in demo mode`}
-              description={t`Emails are logged, not sent. Sending requires the AWS SES driver with an Enterprise license, or Twenty Cloud.`}
+              description={t`Emails are logged, not sent. Sending requires the AWS SES driver with an Enterprise license, or CallLiveAI Cloud.`}
               Button={
                 <Button
                   title={t`Upgrade`}

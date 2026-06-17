@@ -20,10 +20,11 @@ import { WorkspaceSelectionFooter } from '@/auth/sign-in-up/components/Workspace
 import { SignInUpSSOIdentityProviderSelection } from '@/auth/sign-in-up/components/internal/SignInUpSSOIdentityProviderSelection';
 import { SignInUpWorkspaceScopeFormEffect } from '@/auth/sign-in-up/components/internal/SignInUpWorkspaceScopeFormEffect';
 import { isMultiWorkspaceEnabledState } from '@/client-config/states/isMultiWorkspaceEnabledState';
+import { isDeveloperDefaultSignInPrefilledState } from '@/client-config/states/isDeveloperDefaultSignInPrefilledState';
 import { useGetPublicWorkspaceDataByDomain } from '@/domain-manager/hooks/useGetPublicWorkspaceDataByDomain';
 import { useIsCurrentLocationOnAWorkspace } from '@/domain-manager/hooks/useIsCurrentLocationOnAWorkspace';
 import { useIsCurrentLocationOnDefaultDomain } from '@/domain-manager/hooks/useIsCurrentLocationOnDefaultDomain';
-import { type JSX, useMemo } from 'react';
+import { type JSX, useEffect, useMemo } from 'react';
 
 import { SignInUpGlobalScopeFormEffect } from '@/auth/sign-in-up/components/internal/SignInUpGlobalScopeFormEffect';
 import { SignInUpTwoFactorAuthenticationProvision } from '@/auth/sign-in-up/components/internal/SignInUpTwoFactorAuthenticationProvision';
@@ -91,7 +92,7 @@ export const SignInUp = () => {
   const clientConfigApiStatus = useAtomStateValue(clientConfigApiStatusState);
 
   const { form } = useSignInUpForm();
-  const { signInUpStep } = useSignInUp(form);
+  const { signInUpStep, continueWithCredentials, submitCredentials } = useSignInUp(form);
   const { isDefaultDomain } = useIsCurrentLocationOnDefaultDomain();
   const { isOnAWorkspace } = useIsCurrentLocationOnAWorkspace();
   const workspacePublicData = useAtomStateValue(workspacePublicDataState);
@@ -100,10 +101,33 @@ export const SignInUp = () => {
   const isMultiWorkspaceEnabled = useAtomStateValue(
     isMultiWorkspaceEnabledState,
   );
+  const isDeveloperDefaultSignInPrefilled = useAtomStateValue(
+    isDeveloperDefaultSignInPrefilledState,
+  );
   const { workspaceInviteHash, workspace: workspaceFromInviteHash } =
     useWorkspaceFromInviteHash();
 
   const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    if (
+      clientConfigApiStatus.isLoadedOnce &&
+      isDeveloperDefaultSignInPrefilled === true
+    ) {
+      if (signInUpStep === SignInUpStep.Init) {
+        continueWithCredentials();
+      } else if (signInUpStep === SignInUpStep.Password) {
+        submitCredentials(form.getValues());
+      }
+    }
+  }, [
+    clientConfigApiStatus.isLoadedOnce,
+    isDeveloperDefaultSignInPrefilled,
+    signInUpStep,
+    continueWithCredentials,
+    submitCredentials,
+    form,
+  ]);
 
   const onClickOnLogo = () => {
     setSignInUpStep(SignInUpStep.Init);
@@ -130,7 +154,7 @@ export const SignInUp = () => {
     }
 
     if (isGlobalScope) {
-      return t`Welcome to Twenty`;
+      return t`Welcome to CallLiveAI`;
     }
 
     const workspaceName = workspacePublicData?.displayName;
